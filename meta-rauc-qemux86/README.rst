@@ -13,22 +13,10 @@ This layer depends on::
 Patches
 =======
 
-Please submit patches via GitHub pull request on https://github.com/rauc/meta-rauc-demo
+Please submit any patches against the meta-rauc-qemux86 layer via GitHub
+pull request on https://github.com/rauc/meta-rauc-community.
 
-Maintainer: Enrico Joerns <ejo@pengutronix.de>
-
-0. Using 'kas' tool to build exmple BSP
-=======================================
-
-::
-
-  $ git clone https://github.com/rauc/meta-rauc-demo.git
-  $ kas checkout meta-rauc-demo/meta-rauc-qemux86/kas-qemu-grub.yml
-  $ kas shell meta-rauc-demo/meta-rauc-qemux86/kas-qemu-grub.yml
-  % ../meta-rauc-demo/create-example-keys.sh
-  % bitbake core-bundle-minimal
-
-
+Maintainer: Leon Anavi <leon.anavi@konsulko.com>
 
 I. Adding the meta-rauc-qemux86 layer to your build
 ===================================================
@@ -42,15 +30,48 @@ II. Build The qemu Demo System
 
   $ source oe-init-build-env
 
+Add configuration required for qemux86 to your local.conf::
+
+   # Generic qemux86 settings
+   MACHINE_FEATURES:append = " pcbios efi"
+   EXTRA_IMAGEDEPENDS += "ovmf"
+
+Set the ``MACHINE`` to ``qemux86-64`` if not set yet::
+
+   MACHINE = "qemux86-64"
+
 It is recommended, but not necessary, to enable 'systemd'::
 
-  INIT_MANAGER = "systemd"
+   INIT_MANAGER = "systemd"
 
-grub-efi::
+Add configuration required for meta-rauc-qemux86 to your local.conf::
 
-  MACHINE_FEATURES += "pcbios efi"
-  EFI_PROVIDER = "grub-efi"
-  IMAGE_INSTALL:append = "grub grub-efi"
+   # Settings for meta-rauc-qemux86
+   IMAGE_INSTALL:append = " rauc"
+   PREFERRED_RPROVIDER_virtual-grub-bootconf = "rauc-qemu-grubconf"
+
+Make sure either your distro (recommended) or your local.conf have ``rauc``
+``DISTRO_FEATURE`` enabled::
+
+   DISTRO_FEATURES:append = " rauc"
+
+You should also enable ``debug-tweaks`` and an ssh server to simplify
+interaction with the system::
+
+   EXTRA_IMAGE_FEATURES += "debug-tweaks"
+   EXTRA_IMAGE_FEATURES += "ssh-server-openssh"
+
+It is also recommended, but not strictly necessary, to enable 'systemd'::
+
+   INIT_MANAGER = "systemd"
+
+Create example authentication keys (from sourced environment)::
+
+  $ ../create-example-keys.sh
+
+This will place the keys in a directory ``example-ca/`` in your build dir and
+configure your ``conf/site.conf`` to let ``RAUC_KEYRING_FILE``,
+``RAUC_KEY_FILE`` and ``RAUC_CERT_FILE`` point to this.
 
 Build::
 
@@ -66,30 +87,38 @@ II. Build The Demo Update Bundle
 III. Run The qemu Demo System
 =============================
 
-* Boot::
+* Boot qemu image::
 
     $ runqemu core-image-minimal wic nographic ovmf slirp
     
     ...
     root@qemux86-64:~#
 
-* Show RAUC status::
+To see that RAUC is configured correctly and can interact with the bootloader,
+run::
 
-    # rauc status
+  # rauc status
 
-* Obtain IP address::
+IV. Build and Install The Demo Bundle
+=====================================
+
+To build the bundle, run::
+
+  $ bitbake qemu-demo-bundle
+
+* Obtain an IP address on the target::
 
     # udhcpc -i eth0
 
-* Copy Update Bundle::
+* Copy update Bundle from host to target::
 
     $ scp -P 2222 tmp/deploy/images/qemux86-64/qemu-demo-bundle-qemux86-64.raucb root@localhost:/tmp
 
-* Check Bundle::
+* Check Bundle on target::
 
     # rauc info /tmp/qemu-demo-bundle-qemux86-64.raucb
 
-* Install Bundle::
+* Install the Bundle::
 
     # rauc install /tmp/qemu-demo-bundle-qemux86-64.raucb
     installing
@@ -121,8 +150,16 @@ III. Run The qemu Demo System
 
     # systemctl reboot
 
-* Foo
+A. Using 'kas' tool to build exmple BSP
+=======================================
 
-Welcome to GRUB!
+::
 
-error: no such device: ((hd0,gpt1)/EFI/BOOT)/EFI/BOOT/grub.cfg.
+  $ git clone https://github.com/rauc/meta-rauc-demo.git
+  $ kas checkout meta-rauc-demo/meta-rauc-qemux86/kas-qemu-grub.yml
+  $ kas shell meta-rauc-demo/meta-rauc-qemux86/kas-qemu-grub.yml
+  % ../meta-rauc-demo/create-example-keys.sh
+  % bitbake core-bundle-minimal
+
+
+
