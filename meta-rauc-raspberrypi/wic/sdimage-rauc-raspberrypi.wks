@@ -1,0 +1,11 @@
+# short-description: Create Raspberry Pi RAUC demo SD card image
+# long-description: Creates a partitioned SD card image for use with
+# Raspberry Pi.
+# Boot files are located in the first vfat partition. We leave some extra space for updating boot files
+# root_a and root_b are redundant root file system partitions
+# data is a non-redundant data partition
+
+part --fixed-size 50M --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot --active --align 4096
+part / --fixed-size 200M --source rootfs --ondisk mmcblk0 --fstype=ext4 --label root_a --align 4096
+part --fixed-size 200M --source rootfs --ondisk mmcblk0 --fstype=ext4 --label root_b --align 4096
+part /data --size 100M --ondisk mmcblk0 --fstype=ext4 --label data --align 4096
