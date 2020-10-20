@@ -6,6 +6,7 @@
 # data is a non-redundant data partition
 
 part --fixed-size 50M --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot --active --align 4096
-part / --fixed-size 200M --source rootfs --ondisk mmcblk0 --fstype=ext4 --label root_a --align 4096
+# start partition at 104MB to leav space for the boot partition shadow copy
+part / --fixed-size 200M --source rootfs --ondisk mmcblk0 --fstype=ext4 --label root_a --align 106496
 part --fixed-size 200M --source rootfs --ondisk mmcblk0 --fstype=ext4 --label root_b --align 4096
 part /data --size 100M --ondisk mmcblk0 --fstype=ext4 --label data --align 4096
