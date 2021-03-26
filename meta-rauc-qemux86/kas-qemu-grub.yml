@@ -26,7 +26,7 @@ local_conf_header:
   meta-custom: |
     INIT_MANAGER = "systemd"
     MACHINE_FEATURES += "pcbios efi"
-    DISTRO_FEATURES += "rauc"
+    DISTRO_FEATURES_append = " rauc"
     EFI_PROVIDER = "grub-efi"
     IMAGE_FSTYPES = "tar.bz2 wic"
     WKS_FILE = "qemux86-grub-efi.wks"
