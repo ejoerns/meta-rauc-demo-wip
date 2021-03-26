@@ -103,6 +103,7 @@ CONFFILE=${BUILDDIR}/conf/site.conf
 echo ""
 echo "Writing RAUC key configuration to site.conf ..."
 
+if test -f $CONFFILE; then
 if grep -q "^RAUC_KEYRING_FILE.*=" $CONFFILE; then
 	echo "RAUC_KEYRING_FILE already configured, aborting key configuration"
 	exit 0
@@ -114,6 +115,7 @@ fi
 if grep -q "^RAUC_CERT_FILE.*=" $CONFFILE; then
 	echo "RAUC_CERT_FILE already configured, aborting key configuration"
 	exit 0
+fi
 fi
 
 echo "RAUC_KEYRING_FILE=\"${BUILDDIR}/example-ca/ca.cert.pem\"" >> $CONFFILE
