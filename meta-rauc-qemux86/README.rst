@@ -21,8 +21,21 @@ Please submit patches via GitHub pull request on https://github.com/rauc/meta-ra
 
 Maintainer: Enrico Joerns <ejo@pengutronix.de>
 
+0. Using 'kas' tool to build exmple BSP
+=======================================
+
+::
+
+  $ git clone https://github.com/rauc/meta-rauc-demo.git
+  $ kas checkout meta-rauc-demo/meta-rauc-qemux86/kas-qemu-grub.yml
+  $ kas shell meta-rauc-demo/meta-rauc-qemux86/kas-qemu-grub.yml
+  % ../meta-rauc-demo/create-example-keys.sh
+  % bitbake core-bundle-minimal
+
+
+
 I. Adding the meta-rauc-qemux86 layer to your build
-=================================================
+===================================================
 
 Run 'bitbake-layers add-layer meta-rauc-qemux86'
 
